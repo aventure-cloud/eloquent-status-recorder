@@ -41,9 +41,11 @@ trait HasStatus
         event(new StatusChanging($status, $this));
 
         $this->runOnChangeCallback($status);
-        $this->updateStatus($status);
+        $newStatus = $this->updateStatus($status);
 
         event(new StatusChanged($status, $this));
+
+        return $newStatus;
     }
 
     /**
