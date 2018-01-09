@@ -29,7 +29,7 @@ To publish migration script execute:
 
 And run with artisan command:
 
-`php artisan migrate`
+`php artisan migrate --path=/database/migrations`
 
 
 ## Use
@@ -76,3 +76,10 @@ class Order extends Model {
     }
 }
 ```
+
+
+## Events
+Every time a status change happen two event will fire with attached the current eloquent model instance
+and the given status:
+- StatusChanging (Before status is saved)
+- StatusChanged (After status changed is performed)
