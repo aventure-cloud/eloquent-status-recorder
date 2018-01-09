@@ -29,7 +29,7 @@ trait HasStatus
      * @throws InvalidStatusChange
      * @throws UndefinedStatus
      */
-    public function setStatusAttribute(string $status)
+    public function changeStatusTo(string $status)
     {
         if ($this->status === $status) {
             return;
