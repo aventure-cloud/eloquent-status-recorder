@@ -1,0 +1,34 @@
+{
+    "name": "aventure-cloud/eloquent-status-recorder",
+    "description": "Eloquent model's status management with history",
+    "keywords": ["laravel", "eloquent", "status"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Valerio Barbera",
+            "email": "valerio@aventuresrl.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "illuminate/support": "^5.5",
+        "illuminate/database": "^5.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.5",
+        "fzaninotto/faker": "^1.6",
+        "mockery/mockery": "^0.9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "AventureCloud\\EloquentStatusRecorder\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AventureCloud\\EloquentStatusRecorder\\EloquentStatusRecorderServiceProvider"
+            ]
+        }
+    }
+}
