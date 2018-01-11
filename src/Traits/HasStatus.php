@@ -23,9 +23,55 @@ trait HasStatus
     }
 
     /**
+     * List of all available statuses
+     *
+     * @return array
+     */
+    public function statuses()
+    {
+        return array_keys($this->statuses);
+    }
+
+    /**
+     * Available statuses after current status value
+     *
+     * @return array
+     */
+    public function nextAvailableStatuses()
+    {
+        $result = [];
+        foreach ($this->statuses as $key => $value) {
+            if($key === $this->status)
+                continue;
+
+            // If there are rules declared using FROM key
+            if(array_key_exists('from', $value))
+            {
+                if(is_string($value['from']) && $value['from'] === $this->status)
+                    $result[] = $key;
+
+                if(is_array($value['from']) && in_array($this->status, $value['from']))
+                    $result[] = $key;
+            }
+
+            // If there are rules declared using NOT-FROM key
+            if (array_key_exists('not-from', $value))
+            {
+                if(is_string($value['not-from']) && $value['not-from'] !== $this->status)
+                    $result[] = $key;
+
+                if(is_array($value['not-from']) && !in_array($this->status, $value['not-from']))
+                    $result[] = $key;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Set new status
      *
      * @param string $status
+     * @return mixed|void
      * @throws InvalidStatusChange
      * @throws UndefinedStatus
      */
