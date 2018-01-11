@@ -51,9 +51,34 @@ class Order extends Model {
 }
 ```
 
+## Utility methods
+```php
+$order = Order::find(1);
+
+/* 
+ * Current status
+ */
+$order->status;
+
+/* 
+ * List of all available statuses
+ */
+$order->statuses();
+
+/* 
+ * Available statuses after current status value based on "from" and "not-from" rules
+ */
+$order->nextAvailableStatuses();
+
+/* 
+ * Change status
+ */
+$order->changeStatusTo('shipped');
+```
+
 ## Auto-run callbacks
 In some cases, you need to do something after a specific status is set. 
-For example, send a mail after an order is cancelled. This package 
+For example, send an mail after an order is "shipped". This package 
 invokes a method after status change by the convention of 
 `on + status_name (camel cased)`:
 
@@ -70,9 +95,9 @@ class Order extends Model {
         'cancelled' => ['not-from' => ['arrived']],
     ];
     
-    public function onCancelled()
+    public function onShipped()
     {
-        // Send cancellation email to the user
+        // Send email to the user
     }
 }
 ```
@@ -82,4 +107,4 @@ class Order extends Model {
 Every time a status change happen two event will fire with attached the current eloquent model instance
 and the given status:
 - StatusChanging (Before status is saved)
-- StatusChanged (After status changed is performed)
+- StatusChanged (After status change is performed)
