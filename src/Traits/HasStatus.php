@@ -12,72 +12,15 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 trait HasStatus
 {
     /**
-     * Get last status as attribute
-     *
-     * @return mixed
-     */
-    public function getStatusAttribute()
-    {
-        //return name of the latest status
-        return optional($this->lastStatus)->name;
-    }
-
-    /**
-     * List of all available statuses
-     *
-     * @return array
-     */
-    public function statuses()
-    {
-        return array_keys($this->statuses);
-    }
-
-    /**
-     * Available statuses after current status value
-     *
-     * @return array
-     */
-    public function nextAvailableStatuses()
-    {
-        $result = [];
-        foreach ($this->statuses as $key => $value) {
-            if($key === $this->status)
-                continue;
-
-            // If there are rules declared using FROM key
-            if(array_key_exists('from', $value))
-            {
-                if(is_string($value['from']) && $value['from'] === $this->status)
-                    $result[] = $key;
-
-                if(is_array($value['from']) && in_array($this->status, $value['from']))
-                    $result[] = $key;
-            }
-
-            // If there are rules declared using NOT-FROM key
-            if (array_key_exists('not-from', $value))
-            {
-                if(is_string($value['not-from']) && $value['not-from'] !== $this->status)
-                    $result[] = $key;
-
-                if(is_array($value['not-from']) && !in_array($this->status, $value['not-from']))
-                    $result[] = $key;
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Set new status
      *
      * @param string $status
-     * @return mixed|void
      * @throws InvalidStatusChange
      * @throws UndefinedStatus
      */
     public function changeStatusTo(string $status)
     {
-        if ($this->status === $status) {
+        if ($this->status->name === $status) {
             return;
         }
         if (!$this->canBe($status)) {
@@ -168,11 +111,11 @@ trait HasStatus
         $from = $this->statuses[$status]['from'];
 
         if (is_string($from)) {
-            return $this->status === $from;
+            return $this->status->name === $from;
         }
 
         foreach ($from as $toOption) {
-            if ($this->status === $toOption) {
+            if ($this->status->name === $toOption) {
                 return true;
             }
         }
@@ -195,11 +138,11 @@ trait HasStatus
         $from = $this->statuses[$status]['not-from'];
 
         if (is_string($from)) {
-            return $this->status !== $from;
+            return $this->status->name !== $from;
         }
 
         foreach ($from as $toOption) {
-            if ($this->status === $toOption) {
+            if ($this->status->name === $toOption) {
                 return false;
             }
         }
@@ -223,9 +166,10 @@ trait HasStatus
      *
      * @return MorphOne
      */
-    public function lastStatus() : MorphOne
+    public function status() : MorphOne
     {
         return $this->morphOne(config('eloquent-status-recorder.status_model'), 'statusable')
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'desc')
+            ->withDefault();
     }
 }

@@ -57,11 +57,12 @@ $order = Order::find(1);
 
 /* 
  * Current status
+ * instance of model configured in config('eloquent-status-recorder.status_model')
  */
 $order->status;
 
 /* 
- * List of all available statuses
+ * List of all available statuses for current model
  */
 $order->statuses();
 
