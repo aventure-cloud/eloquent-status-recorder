@@ -43,7 +43,7 @@ trait HasStatus
      * @param mixed $status
      * @return mixed
      */
-    public function updateStatus($status)
+    protected function updateStatus($status)
     {
         //if model not yet exist, return null
         if(!$this->exists){
@@ -64,7 +64,7 @@ trait HasStatus
      * @return bool
      * @throws UndefinedStatus
      */
-    public function canBe($status): bool
+    protected function canBe($status): bool
     {
         $this->throwExceptionIfStatusInvalid($status);
         return $this->checkFrom($status) && $this->checkNotFrom($status);
@@ -102,7 +102,7 @@ trait HasStatus
      * @param $status
      * @return bool
      */
-    private function checkFrom($status): bool
+    protected function checkFrom($status): bool
     {
         if (!array_key_exists('from', $this->statuses[$status])) {
             return true;
@@ -129,7 +129,7 @@ trait HasStatus
      * @param $status
      * @return bool
      */
-    private function checkNotFrom($status): bool
+    protected function checkNotFrom($status): bool
     {
         if (!array_key_exists('not-from', $this->statuses[$status])) {
             return true;
@@ -148,6 +148,51 @@ trait HasStatus
         }
 
         return true;
+    }
+
+    /**
+     * List of all available statuses
+     *
+     * @return array
+     */
+    public function statuses()
+    {
+        return array_keys($this->statuses);
+    }
+
+    /**
+     * Get next valid statuses based on current status and "from/not-from" rules
+     *
+     * @return array
+     */
+    public function nextStatusesAvailable()
+    {
+        $result = [];
+        foreach ($this->statuses as $key => $value) {
+            if($key === $this->status->name)
+                continue;
+
+            // If there are rules declared using FROM key
+            if(array_key_exists('from', $value))
+            {
+                if(is_string($value['from']) && $value['from'] === $this->status->name)
+                    $result[] = $key;
+
+                if(is_array($value['from']) && in_array($this->status->name, $value['from']))
+                    $result[] = $key;
+            }
+
+            // If there are rules declared using NOT-FROM key
+            if (array_key_exists('not-from', $value))
+            {
+                if(is_string($value['not-from']) && $value['not-from'] !== $this->status->name)
+                    $result[] = $key;
+
+                if(is_array($value['not-from']) && !in_array($this->status->name, $value['not-from']))
+                    $result[] = $key;
+            }
+        }
+        return $result;
     }
 
     /**
